@@ -1,25 +1,21 @@
 function handleScratch(deltaAngle) {
     if (!normalBuffer) return;
 
-    const angleSpeed = deltaAngle;
-
-    // Convert degrees to time movement
+    // degrees → seconds mapping
     const secondsPerDegree = duration / 360;
-    let deltaTime = angleSpeed * secondsPerDegree;
+    let deltaTime = deltaAngle * secondsPerDegree;
 
-    // HYBRID MODEL:
-    // Slow movements = continuous playbackRate style
-    // Fast movements = direct reposition jumps
+    // Apply pitch multiplier
+    deltaTime *= pitchRate;
 
-    const speedAbs = Math.abs(angleSpeed);
+    let speedAbs = Math.abs(deltaAngle);
 
     if (speedAbs < 3) {
-        // continuous
-        let newTime = currentTime + deltaTime;
-        setAudioPosition(newTime);
+        // continuous slow movement
+        setAudioPosition(currentTime + deltaTime);
     } else {
-        // jump (simulates CDJ)
-        let newTime = currentTime + (deltaTime * 4);
-        setAudioPosition(newTime);
+        // jump mode (CDJ-like)
+        setAudioPosition(currentTime + (deltaTime * 4));
     }
 }
+``
