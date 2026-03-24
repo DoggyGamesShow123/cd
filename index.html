@@ -2,16 +2,31 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>3D DJ Turntable Player</title>
+<title>CD Player</title>
 
-<link rel="stylesheet" href="css/style.css">
+<!-- CSS -->
+<link rel="stylesheet" href="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/css/style.css">
 
-<!-- Load JSZip (You can replace with your GitHub raw URL if wanted) -->
-<script src="js/jszip.min.js"></script>
+<!-- JSZip -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
 
-<script src="js/utils.js"></script>
-<script src="js/engine.js"></script>
-<scriptscript src="js/init.js"></script>
+<!-- UTILITIES -->
+<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/utils.js"></script>
+
+<!-- AUDIO ENGINE -->
+<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/engine.js"></script>
+
+<!-- TURNTABLE PHYSICS -->
+<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/turnable.js"></script>
+
+<!-- SCRATCH ENGINE -->
+<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/scrub.js"></script>
+
+<!-- PITCH CONTROL -->
+<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/pitch.js"></script>
+
+<!-- INIT -->
+<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/turntableAppInit.js"></script>
 
 </head>
 <body>
@@ -36,13 +51,18 @@
 <div id="turntable">
     <div id="cd">
         <div id="cd-top"></div>
-        <div id="cd-bottom"></div>
+        <div id="cd-bottom"
+             style="background-image:url('https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/images/cd_bottom.png');">
+        </div>
     </div>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", initTurntableApp);
+document.addEventListener("DOMContentLoaded", () => {
+    initTurntableApp();
+});
 </script>
 
 </body>
 </html>
+``
