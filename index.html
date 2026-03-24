@@ -5,28 +5,40 @@
 <title>CD Player</title>
 
 <!-- CSS -->
-<link rel="stylesheet" href="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/css/style.css">
+https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/css/style.css?raw=1
 
-<!-- JSZip -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+<!-- JSZip (for ZIP support) -->
+https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js</script>
 
-<!-- UTILITIES -->
-<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/utils.js"></script>
+<!-- Utilities -->
+https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/utils.js?raw=1</script>
 
-<!-- AUDIO ENGINE -->
-<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/engine.js"></script>
+<!-- Audio Engine -->
+https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/engine.js?raw=1</script>
 
-<!-- TURNTABLE PHYSICS -->
-<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/turnable.js"></script>
+<!-- Turntable Physics -->
+https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/turntable.js?raw=1</script>
 
-<!-- SCRATCH ENGINE -->
-<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/scrub.js"></script>
+<!-- Scratch Engine -->
+https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/scrub.js?raw=1</script>
 
-<!-- PITCH CONTROL -->
-<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/pitch.js"></script>
+<!-- Pitch Slider -->
+https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/pitch.js?raw=1</script>
 
-<!-- INIT -->
-<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/turntableAppInit.js"></script>
+<!-- Init -->
+https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/turntableAppInit.js?raw=1</script>
+
+<style>
+/* Fallback blue GameCube-style disc */
+.fallback-disc {
+    background-image: radial-gradient(circle at center,
+        #5a5aff 0%,    /* brighter inner blue */
+        #3939d9 40%,   /* GC-style rich blue */
+        #1e1e66 70%,   /* deep indigo */
+        #0f0f33 100%   /* near-black outer edge */
+    );
+}
+</style>
 
 </head>
 <body>
@@ -48,21 +60,49 @@
     <div id="timeDisplay">00:00 / 00:00</div>
 </div>
 
+<!-- TURNTABLE -->
 <div id="turntable">
     <div id="cd">
-        <div id="cd-top"></div>
+        <div id="cd-top" class="fallback-disc"></div>
+
         <div id="cd-bottom"
-             style="background-image:url('https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/images/cd_bottom.png');">
+             style="background-image:url('https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/images/cd_bottom.png?raw=1');">
         </div>
     </div>
 </div>
 
 <script>
+/* Auto fallback disc text */
+function applyFallbackDisc(filename) {
+    const cdTop = document.getElementById("cd-top");
+
+    cdTop.classList.add("fallback-disc");
+
+    const safeName = filename.replace(/\.[^/.]+$/, "");
+
+    cdTop.style.backgroundImage =
+       `radial-gradient(circle at center,
+        #5a5aff 0%, #3939d9 40%, #1e1e66 70%, #0f0f33 100%),
+        url("data:image/svg+xml;utf8,
+        <svg xmlns='http://www.w3.org/2000/svg' width='512' height='512'>
+            <text x='50%' y='92%' font-size='40' fill='white'
+            text-anchor='middle' font-family='Arial'>${safeName}</text>
+        </svg>")`;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     initTurntableApp();
+
+    document.getElementById("fileInput").addEventListener("change", e => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setTimeout(() => {
+            applyFallbackDisc(file.name);
+        }, 1000);
+    });
 });
 </script>
 
 </body>
 </html>
-``
