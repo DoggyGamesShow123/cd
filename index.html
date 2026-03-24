@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>3D DJ Turntable Player</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<script src="js/jszip.min.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/turntable.js"></script>
+<script src="js/scrub.js"></script>
+<script src="js/pitch.js"></script>
+
+</head>
+<body>
+
+<div id="ui">
+    <input type="file" id="fileInput" accept=".mp3,.zip">
+
+    <div id="controls">
+        <button id="playBtn">Play</button>
+        <button id="pauseBtn">Pause</button>
+    </div>
+
+    <div id="pitchBox">
+        <label>Pitch</label>
+        <input id="pitchSlider" type="range" min="-50" max="50" value="0">
+        <span id="pitchValue">0%</span>
+    </div>
+
+    <div id="timeDisplay">00:00 / 00:00</div>
+</div>
+
+<div id="turntable">
+    <div id="cd">
+        <div id="cd-top"></div>
+        <div id="cd-bottom"></div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", initTurntableApp);
+</script>
+
+</body>
+</html>
