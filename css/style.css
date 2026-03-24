@@ -21,6 +21,23 @@ body {
     border-radius: 6px;
     cursor: pointer;
 }
+#controls button:hover {
+    background: #444;
+}
+
+#pitchBox {
+    margin-top: 10px;
+    background: #222;
+    padding: 10px;
+    border-radius: 8px;
+}
+#pitchSlider {
+    width: 160px;
+}
+#pitchValue {
+    margin-left: 10px;
+    font-weight: bold;
+}
 
 #turntable {
     position: absolute;
@@ -33,11 +50,11 @@ body {
 #cd {
     width: 350px;
     height: 350px;
-    position: relative;
     transform-style: preserve-3d;
+    position: relative;
     cursor: grab;
+    transition: transform 0.07s linear;
 }
-
 #cd:active {
     cursor: grabbing;
 }
@@ -51,11 +68,9 @@ body {
     background-size: cover;
     background-position: center;
 }
-
 #cd-top {
     transform: translateZ(6px);
 }
-
 #cd-bottom {
     transform: rotateY(180deg) translateZ(6px);
 }
