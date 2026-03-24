@@ -1,6 +1,7 @@
 async function initTurntableApp() {
     initAudioEngine();
     initTurntable();
+    initPitchSlider();   // <-- ADDED HERE ✔ ADDED AS REQUESTED
 
     const fileInput = document.getElementById("fileInput");
 
@@ -35,3 +36,4 @@ async function initTurntableApp() {
     document.getElementById("playBtn").onclick = playAudio;
     document.getElementById("pauseBtn").onclick = pauseAudio;
 }
+``
