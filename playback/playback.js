@@ -1,166 +1,169 @@
-// playback/playback.js
-// UNIVERSAL PLAYBACK ENGINE FOR CD PLAYER + TURNTABLE SCRATCHING
+/* ==========================================================
+   GLOBAL PLAYBACK ENGINE FOR CD PLAYER / DJ TURNTABLE SYSTEM
+   Works with: turntable.js, scrub.js, pitch.js, engine.js
+   ========================================================== */
 
-export class PlaybackEngine {
-    constructor() {
-        this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        this.buffer = null;
-        this.source = null;
-        this.playing = false;
+(function () {
 
-        this.position = 0;
-        this.lastTime = 0;
-        this.duration = 0;
+    class PlaybackEngine {
+        constructor() {
+            this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            this.buffer = null;
+            this.source = null;
+            this.playing = false;
 
-        this.pitch = 1.0;
+            this.position = 0;        // current timestamp in seconds
+            this.lastTime = 0;        // previous audioCtx time
+            this.duration = 0;
 
-        this.eventCallbacks = {
-            timeupdate: [],
-            ready: []
-        };
+            this.pitch = 1.0;         // speed modifier (setPitch)
+            this.scratchActive = false;
 
-        this._ticker();
-    }
+            // event listeners (timeupdate, ready)
+            this.eventCallbacks = {
+                timeupdate: [],
+                ready: []
+            };
 
-    /* ------------------------------
-       LOAD AUDIO FILE
-    --------------------------------*/
-    async loadFile(file) {
-        const arrayBuffer = await file.arrayBuffer();
-        this.buffer = await this.audioCtx.decodeAudioData(arrayBuffer);
+            this._ticker();
+        }
 
-        this.duration = this.buffer.duration;
-        this.position = 0;
+        /* ==========================================================
+           LOAD FILE (MP3 / WAV / ZIP extracted data)
+        ========================================================== */
+        async loadFile(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            this.buffer = await this.audioCtx.decodeAudioData(arrayBuffer);
 
-        this._emit("ready", this.duration);
-    }
+            this.duration = this.buffer.duration;
+            this.position = 0;
 
-    /* ------------------------------
-       CREATE SOURCE NODE
-    --------------------------------*/
-    _createSource() {
-        this.source = this.audioCtx.createBufferSource();
-        this.source.buffer = this.buffer;
-        this.source.playbackRate.value = this.pitch;
-        this.source.connect(this.audioCtx.destination);
-    }
+            this._emit("ready", this.duration);
+        }
 
-    /* ------------------------------
-       PLAY
-    --------------------------------*/
-    play() {
-        if (!this.buffer || this.playing) return;
+        /* ==========================================================
+           INTERNAL AUDIO SOURCE CREATION
+        ========================================================== */
+        _createSource() {
+            this.source = this.audioCtx.createBufferSource();
+            this.source.buffer = this.buffer;
+            this.source.playbackRate.value = this.pitch;
+            this.source.connect(this.audioCtx.destination);
+        }
 
-        this._createSource();
-        this.source.start(0, this.position);
+        /* ==========================================================
+           PLAYBACK CONTROL
+        ========================================================== */
+        play() {
+            if (!this.buffer || this.playing) return;
 
-        this.lastTime = this.audioCtx.currentTime;
-        this.playing = true;
+            this._createSource();
+            this.source.start(0, this.position);
 
-        this.source.onended = () => {
-            if (this.position >= this.duration - 0.05) {
-                this.stop();
-                this.position = 0;
-            }
-        };
-    }
+            this.lastTime = this.audioCtx.currentTime;
+            this.playing = true;
 
-    /* ------------------------------
-       PAUSE
-    --------------------------------*/
-    pause() {
-        if (!this.playing) return;
+            this.source.onended = () => {
+                if (this.position >= this.duration - 0.05) {
+                    this.stop();
+                    this.position = 0;
+                }
+            };
+        }
 
-        this.source.stop();
-        this.source.disconnect();
+        pause() {
+            if (!this.playing) return;
 
-        this.position += (this.audioCtx.currentTime - this.lastTime) * this.pitch;
-        this.playing = false;
-    }
-
-    /* ------------------------------
-       STOP
-    --------------------------------*/
-    stop() {
-        if (this.source) {
-            try { this.source.stop(); } catch {}
+            this.source.stop();
             this.source.disconnect();
-        }
-        this.playing = false;
-    }
 
-    /* ------------------------------
-       SET POSITION (Used for scratching)
-    --------------------------------*/
-    setPosition(t) {
-        if (!this.buffer) return;
-
-        this.position = Math.max(0, Math.min(this.duration, t));
-
-        if (this.playing) {
-            // restart audio at new position
-            this.pause();
-            this.play();
+            this.position += (this.audioCtx.currentTime - this.lastTime) * this.pitch;
+            this.playing = false;
         }
 
-        this._emit("timeupdate", this.position, this.duration);
-    }
-
-    /* ------------------------------
-       SCRATCH HANDLE
-       deltaTime = time movement from turntable.js
-    --------------------------------*/
-    scratch(deltaTime) {
-        let newPos = this.position + deltaTime;
-        this.setPosition(newPos);
-    }
-
-    /* ------------------------------
-       SET PITCH (0.5x to 2.0x)
-    --------------------------------*/
-    setPitch(multiplier) {
-        this.pitch = multiplier;
-
-        if (this.playing && this.source) {
-            this.source.playbackRate.value = multiplier;
+        stop() {
+            if (this.source) {
+                try { this.source.stop(); } catch {}
+                this.source.disconnect();
+            }
+            this.playing = false;
         }
-    }
 
-    /* ------------------------------
-       EVENT HANDLER
-    --------------------------------*/
-    on(event, callback) {
-        if (this.eventCallbacks[event]) {
-            this.eventCallbacks[event].push(callback);
-        }
-    }
+        /* ==========================================================
+           SEEKING / SCRATCHING
+        ========================================================== */
+        setPosition(seconds) {
+            if (!this.buffer) return;
 
-    _emit(event, ...data) {
-        if (this.eventCallbacks[event]) {
-            for (let cb of this.eventCallbacks[event]) cb(...data);
-        }
-    }
+            this.position = Math.max(0, Math.min(this.duration, seconds));
 
-    /* ------------------------------
-       INTERNAL: TIME TICKER
-    --------------------------------*/
-    _ticker() {
-        requestAnimationFrame(() => this._ticker());
-
-        if (this.playing) {
-            let now = this.audioCtx.currentTime;
-            let delta = (now - this.lastTime) * this.pitch;
-
-            this.position += delta;
-
-            this.lastTime = now;
+            if (this.playing) {
+                this.pause();
+                this.play();
+            }
 
             this._emit("timeupdate", this.position, this.duration);
+        }
 
-            if (this.position >= this.duration) {
-                this.stop();
-                this.position = 0;
+        /* ==========================================================
+           SCRATCHING (called from turntable.js / scrub.js)
+        ========================================================== */
+        scratch(deltaSeconds) {
+            const newPos = this.position + deltaSeconds;
+            this.setPosition(newPos);
+        }
+
+        /* ==========================================================
+           PITCH CONTROL
+        ========================================================== */
+        setPitch(multiplier) {
+            this.pitch = multiplier;
+
+            if (this.playing && this.source) {
+                this.source.playbackRate.value = multiplier;
+            }
+        }
+
+        /* ==========================================================
+           EVENT HANDLING
+        ========================================================== */
+        on(event, callback) {
+            if (this.eventCallbacks[event]) {
+                this.eventCallbacks[event].push(callback);
+            }
+        }
+
+        _emit(event, ...data) {
+            if (this.eventCallbacks[event]) {
+                for (let cb of this.eventCallbacks[event]) cb(...data);
+            }
+        }
+
+        /* ==========================================================
+           INTERNAL TIME TICKER (updates playback)
+        ========================================================== */
+        _ticker() {
+            requestAnimationFrame(() => this._ticker());
+
+            if (this.playing) {
+                const now = this.audioCtx.currentTime;
+                const delta = (now - this.lastTime) * this.pitch;
+
+                this.position += delta;
+                this.lastTime = now;
+
+                this._emit("timeupdate", this.position, this.duration);
+
+                if (this.position >= this.duration) {
+                    this.stop();
+                    this.position = 0;
+                }
             }
         }
     }
-}
+
+    // Export globally
+    window.PlaybackEngine = PlaybackEngine;
+
+})();
+``
