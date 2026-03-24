@@ -4,39 +4,40 @@
 <meta charset="UTF-8">
 <title>CD Player</title>
 
-<!-- CSS -->
-https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/css/style.css?raw=1
+<!-- CSS (must use rel="stylesheet") -->
+<link rel="stylesheet" href="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/css/style.css?raw=1">
 
-<!-- JSZip (for ZIP support) -->
-https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js</script>
+<!-- JSZip -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
 
-<!-- Utilities -->
-https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/utils.js?raw=1</script>
+<!-- UTILITIES -->
+<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/utils.js?raw=1"></script>
 
-<!-- Audio Engine -->
-https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/engine.js?raw=1</script>
+<!-- AUDIO ENGINE -->
+<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/engine.js?raw=1"></script>
 
-<!-- Turntable Physics -->
-https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/turntable.js?raw=1</script>
+<!-- TURNTABLE PHYSICS -->
+<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/turntable.js?raw=1"></script>
 
-<!-- Scratch Engine -->
-https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/scrub.js?raw=1</script>
+<!-- SCRATCH ENGINE -->
+<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/scrub.js?raw=1"></script>
 
-<!-- Pitch Slider -->
-https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/pitch.js?raw=1</script>
+<!-- PITCH ENGINE -->
+<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/pitch.js?raw=1"></script>
 
-<!-- Init -->
-https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/turntableAppInit.js?raw=1</script>
+<!-- APP INIT -->
+<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/turntableAppInit.js?raw=1"></script>
 
 <style>
-/* Fallback blue GameCube-style disc */
+/* GameCube-style fallback disc */
 .fallback-disc {
-    background-image: radial-gradient(circle at center,
-        #5a5aff 0%,    /* brighter inner blue */
-        #3939d9 40%,   /* GC-style rich blue */
-        #1e1e66 70%,   /* deep indigo */
-        #0f0f33 100%   /* near-black outer edge */
-    );
+    background-image:
+        radial-gradient(circle at center,
+            #6d6dff 0%,
+            #4b4bd9 35%,
+            #242476 70%,
+            #0a0a33 100%);
+    background-size: cover;
 }
 </style>
 
@@ -66,30 +67,33 @@ https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/turnta
         <div id="cd-top" class="fallback-disc"></div>
 
         <div id="cd-bottom"
-             style="background-image:url('https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/images/cd_bottom.png?raw=1');">
+            style="background-image:url('https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/images/cd_bottom.png?raw=1');">
         </div>
     </div>
 </div>
 
 <script>
-/* Auto fallback disc text */
+/* Fallback GameCube-style blue disc with filename */
 function applyFallbackDisc(filename) {
     const cdTop = document.getElementById("cd-top");
 
+    // keep blue style
     cdTop.classList.add("fallback-disc");
 
-    const safeName = filename.replace(/\.[^/.]+$/, "");
+    const safe = filename.replace(/\.[^/.]+$/, "");
 
+    // embed SVG text on disc
     cdTop.style.backgroundImage =
-       `radial-gradient(circle at center,
-        #5a5aff 0%, #3939d9 40%, #1e1e66 70%, #0f0f33 100%),
+        `radial-gradient(circle at center,
+            #6d6dff 0%, #4b4bd9 35%, #242476 70%, #0a0a33 100%),
         url("data:image/svg+xml;utf8,
         <svg xmlns='http://www.w3.org/2000/svg' width='512' height='512'>
             <text x='50%' y='92%' font-size='40' fill='white'
-            text-anchor='middle' font-family='Arial'>${safeName}</text>
+            text-anchor='middle' font-family='Arial'>${safe}</text>
         </svg>")`;
 }
 
+/* Initialization */
 document.addEventListener("DOMContentLoaded", () => {
     initTurntableApp();
 
@@ -97,9 +101,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const file = e.target.files[0];
         if (!file) return;
 
-        setTimeout(() => {
-            applyFallbackDisc(file.name);
-        }, 1000);
+        // apply fallback if no cover art available
+        applyFallbackDisc(file.name);
     });
 });
 </script>
