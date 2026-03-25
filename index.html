@@ -1,110 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>CD Player</title>
-
-<!-- CSS (must use rel="stylesheet") -->
-<link rel="stylesheet" href="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/css/style.css?raw=1">
-
-<!-- JSZip -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
-
-<!-- UTILITIES -->
-<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/utils.js?raw=1"></script>
-
-<!-- AUDIO ENGINE -->
-<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/engine.js?raw=1"></script>
-
-<!-- TURNTABLE PHYSICS -->
-<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/turntable.js?raw=1"></script>
-
-<!-- SCRATCH ENGINE -->
-<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/scrub.js?raw=1"></script>
-
-<!-- PITCH ENGINE -->
-<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/pitch.js?raw=1"></script>
-
-<!-- APP INIT -->
-<script src="https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/js/turntableAppInit.js?raw=1"></script>
-
+<title>Download EmulatorJS Data</title>
 <style>
-/* GameCube-style fallback disc */
-.fallback-disc {
-    background-image:
-        radial-gradient(circle at center,
-            #6d6dff 0%,
-            #4b4bd9 35%,
-            #242476 70%,
-            #0a0a33 100%);
-    background-size: cover;
-}
+  body {
+    background:#111;
+    color:white;
+    font-family:sans-serif;
+    text-align:center;
+    padding-top:50px;
+  }
+  button {
+    padding:15px 25px;
+    font-size:20px;
+    background:#28a4ff;
+    color:white;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+  }
+  button:hover { background:#1f7fcc; }
 </style>
-
 </head>
 <body>
 
-<div id="ui">
-    <input type="file" id="fileInput" accept=".mp3,.zip">
+<h1>Download EmulatorJS Data</h1>
+<p>This will instantly download the full EmulatorJS data package.</p>
 
-    <div id="controls">
-        <button id="playBtn">Play</button>
-        <button id="pauseBtn">Pause</button>
-    </div>
-
-    <div id="pitchBox">
-        <label>Pitch</label>
-        <input id="pitchSlider" type="range" min="-50" max="50" value="0">
-        <span id="pitchValue">0%</span>
-    </div>
-
-    <div id="timeDisplay">00:00 / 00:00</div>
-</div>
-
-<!-- TURNTABLE -->
-<div id="turntable">
-    <div id="cd">
-        <div id="cd-top" class="fallback-disc"></div>
-
-        <div id="cd-bottom"
-            style="background-image:url('https://raw.githubusercontent.com/DoggyGamesShow123/cd/refs/heads/main/images/cd_bottom.png?raw=1');">
-        </div>
-    </div>
-</div>
+<button onclick="downloadData()">Download Now</button>
 
 <script>
-/* Fallback GameCube-style blue disc with filename */
-function applyFallbackDisc(filename) {
-    const cdTop = document.getElementById("cd-top");
-
-    // keep blue style
-    cdTop.classList.add("fallback-disc");
-
-    const safe = filename.replace(/\.[^/.]+$/, "");
-
-    // embed SVG text on disc
-    cdTop.style.backgroundImage =
-        `radial-gradient(circle at center,
-            #6d6dff 0%, #4b4bd9 35%, #242476 70%, #0a0a33 100%),
-        url("data:image/svg+xml;utf8,
-        <svg xmlns='http://www.w3.org/2000/svg' width='512' height='512'>
-            <text x='50%' y='92%' font-size='40' fill='white'
-            text-anchor='middle' font-family='Arial'>${safe}</text>
-        </svg>")`;
+function downloadData() {
+  const url = "https://cdn.emulatorjs.org/stable/data/emulator.min.zip";
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "emulator-data.zip"; // rename locally
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
 }
-
-/* Initialization */
-document.addEventListener("DOMContentLoaded", () => {
-    initTurntableApp();
-
-    document.getElementById("fileInput").addEventListener("change", e => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        // apply fallback if no cover art available
-        applyFallbackDisc(file.name);
-    });
-});
 </script>
 
 </body>
